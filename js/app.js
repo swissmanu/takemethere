@@ -28,16 +28,45 @@
 					, y: 47.202878
 				}
 			}]
+		}, {
+			from: {
+				id: "008580199"
+				, "name":"Chur, Postplatz"
+				, "coordinate": {
+					"type":"WGS84"
+					, "x":9.531846
+					, "y":46.851301
+				}
+			}
+			, to: {
+				id: '008574671'
+				, name: 'Domat/Ems Plaregna'
+				, coordinate: {
+					type: 'WGS84'
+					, x: 9.462962
+					, y: 46.837529
+				}
+			}
 		}]
 		, location;
 
 
-	$(function() {
-		var domConnections = $('<ul/>');
-		$('body').append(domConnections);
+	function refreshConnections(connections) {
+		var domConnections = $('#connections');
+		domConnections.empty();
 
 		connections.forEach(function(connection, i) {
-			var connectionTitle = connection.from.name + ' nach ' + connection.to.name;
+			var connectionTitle = connection.from.name + ' nach ' + connection.to.name
+				, data = {
+					from: connection.from.id
+					, to: connection.to.id
+				};
+
+			if(connection.via) {
+				data.via = connection.via.map(function(via) {
+					return via.id;
+				});
+			}
 
 			domConnections.append(
 				$('<li/>')
@@ -46,35 +75,40 @@
 					$('<h2/>')
 					.text(connectionTitle)
 				)
+				.append(
+					$('<p/>')
+					.attr('class', 'next-upcoming')
+					.text('Abfragen...')
+				)
 			);
 
-			/*$.get('http://transport.opendata.ch/v1/connections', {
-				from: connection.from.id
-				, to: connection.to.id
-				, via: connection.via[0].id
-			}, function success(response) {*/
-				var response = window.fakeResponse;
-				var nextConnection = response.connections[0]
-					, connectionElement = $('#connection-' + i)
-					, nextConnectionElement = $('.next-upcoming', connectionElement)
-					, text = 'Abfahrt: ' + nextConnection.from.departure + ', Ankunft ' + nextConnection.to.arrival;
+			$.get(
+				'http://transport.opendata.ch/v1/connections'
+				, data
+				, function success(response) {
+					var nextConnection = response.connections[0]
+						, domConnection = $('#connection-' + i)
+						, domNextUpcoming = $('.next-upcoming', domConnection)
+						, times = 'Abfahrt: ' +
+							moment(nextConnection.from.departure).format('HH:mm') +
+							', Ankunft ' +
+							moment(nextConnection.to.arrival).format('HH:mm') + ' '
+						, fromNow = moment(nextConnection.from.departure).fromNow();
 
-
-
-				if(nextConnectionElement.length > 0) {
-					nextConnectionElement.text(text);
-				} else {
-					$(connectionElement).append(
-						$('<p/>')
-						.attr('class', 'next-upcoming')
-						.text(text)
+					domNextUpcoming.text(times);
+					domNextUpcoming.append(
+						$('<span/>')
+						.attr('class', 'fromnow')
+						.text(fromNow)
 					);
-				}
-			//});
+			});
 
 		});
+	}
 
 
+	$(function() {
+		refreshConnections(connections);
 	});
 
 

@@ -1,0 +1,13 @@
+{
+  "name": "takemethere",
+  "version": "0.0.1",
+  "authors": [
+    "Manuel Alabor <msites@msites.net>"
+  ],
+  "license": "MIT",
+  "homepage": "http://github.com/swissmanu/takemethere",
+  "private": true,
+  "dependencies": {
+    "moment": "~2.5.0"
+  }
+}
