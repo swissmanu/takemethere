@@ -5,9 +5,8 @@ Public transportation data is fetched from the awesome [Swiss public transport A
 
 
 ## Experimental
-The idea for `Take Me There` is based on an idea I had recently and wanted to implement.
-
-It's far away from usable for an end user at the moment.
+*Take Me There* is based on an idea I had recently and wanted to implement.
+It's far away from enduser-ready, but states a proof of concept at the moment.
 
 
 ## Ideas for Improvement
