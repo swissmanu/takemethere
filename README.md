@@ -3,6 +3,8 @@ Add your favorite Swiss public transportation routes and get upcoming departure 
 
 Public transportation data is fetched from the awesome [Swiss public transport API](http://transport.opendata.ch/) provided by [opendata.ch](http://opendata.ch/).
 
+## Online Demo powered by GitHub Pages
+* http://swissmanu.github.io/takemethere/
 
 ## Experimental
 *Take Me There* is based on an idea I had recently and wanted to implement.
