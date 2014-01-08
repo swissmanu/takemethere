@@ -10,6 +10,7 @@ It's far away from enduser-ready, but states a proof of concept at the moment.
 
 
 ## Ideas for Improvement
+* Switch direction of a route as simple as possible (without edit or anything)
 * Sort route list depending on the users current geo location
 * Selecting a route shows more upcoming departure times
 * Mobile optimized UI
