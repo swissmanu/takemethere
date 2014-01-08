@@ -3,6 +3,8 @@ Add your favorite Swiss public transportation routes and get upcoming departure 
 
 Public transportation data is fetched from the awesome [Swiss public transport API](http://transport.opendata.ch/) provided by [opendata.ch](http://opendata.ch/).
 
+## Online Demo
+* http://swissmanu.github.io/takemethere/ (powered by GitHub Pages)
 
 ## Experimental
 *Take Me There* is based on an idea I had recently and wanted to implement.
@@ -16,7 +18,7 @@ It's far away from enduser-ready, but states a proof of concept at the moment.
 * Mobile optimized UI
 * Add/remove routes
 * Save routes into browsers local storage
-* Add headers etc. for using the app as webapp on smartphones
+* *Add headers etc. for using the app as webapp on smartphones (done, startup images pending)*
 
 
 ## License (MIT)
