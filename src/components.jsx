@@ -138,11 +138,11 @@ var Connection = React.createClass({
 	render: function() {
 		var self = this;
 		return (
-			<li>
+			<div>
 				{ this.props.connection.from.name } to { this.props.connection.to.name }
 				{ this.props.connection.via && this.props.connection.via.length > 0 ? ' (via ' + this.props.connection.via.length + ' station(s))' : '' }
 				<Button label='Delete' onClick={ this.props.onDelete.bind(null, this.props.connection, this.props.key) } />
-			</li>
+			</div>
 		);
 	}
 });
@@ -199,7 +199,7 @@ var ConnectionForm = React.createClass({
 
 		this.state.via.forEach(function(station, index) {
 			viaNodes.push(
-				<li key={ station.id } className='station via'>
+				<li key={ station.id + '-' + index } className='station via'>
 					<StationDropDown station={ station } placeholder='Via' onChange={ self.handleViaChanged.bind(null, index) } />
 					<Button label='Delete' onClick={ self.handleDeleteVia.bind(null, index) } />
 				</li>
@@ -256,6 +256,7 @@ var ConnectionList = React.createClass({
 
 	, toggleConnectionForm: function() {
 		this.setState({ showAddConnectionForm: !this.state.showAddConnectionForm });
+		return false;
 	}
 	, handleSaveNewConnection: function(origin, destination, via) {
 		this.toggleConnectionForm();
@@ -295,7 +296,11 @@ var ConnectionList = React.createClass({
 	, render: function() {
 		var self = this
 			, connectionNodes = this.state.connections.map(function(connection, index) {
-				return <Connection connection={ connection } key={ connection.id } onDelete={ self.handleDeleteConnection } />
+				return (
+					<li key={ connection.id }>
+						<Connection connection={ connection } onDelete={ self.handleDeleteConnection } />
+					</li>
+				);
 			});
 
 		return (
