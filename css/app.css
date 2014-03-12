@@ -13,3 +13,8 @@ body {
 .fromnow:after {
 	content: ')';
 }
+
+.select2-container {
+	min-width: 100%;
+	display: block;
+}
