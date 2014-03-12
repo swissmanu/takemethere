@@ -1,4 +1,4 @@
-var generateGUID = (typeof(window) !== 'undefined' &&
+/*var generateGUID = (typeof(window) !== 'undefined' &&
 	typeof(window.crypto) !== 'undefined' &&
 	typeof(window.crypto.getRandomValues) !== 'undefined') ?
 	function() {
@@ -214,6 +214,5 @@ function buildDefaultConnections() {
 		, maximumAge: 10000
 		, timeout: 30000
 	});
-*/
 
-})($);
+})($);*/

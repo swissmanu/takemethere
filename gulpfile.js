@@ -1,41 +1,92 @@
+/* jshint ignore:start */
 var gulp = require('gulp')
 	, gutil = require('gulp-util')
-	//, sass = require('gulp-sass')
+	, notify = require('gulp-notify')
+	, rename = require('gulp-rename')
+	, sass = require('gulp-sass')
+	, browserify = require('gulp-browserify')
+	, uglify = require('gulp-uglify')
 	, react = require('gulp-react')
+	, reactify = require('reactify')
+	, debowerify = require('debowerify')
 	, livereload = require('gulp-livereload')
+	, livereloadServer = require('tiny-lr')()
 	, http = require('http')
 	, path = require('path')
-	, ecstatic = require('ecstatic');
+	, express = require('express')
 
-/*gulp.task('styles', function () {
-	return gulp.src('./src/scss/main.scss')
-		.pipe(sass())
-		.pipe(gulp.dest('./dist/css'));
-});*/
+	, srcPaths = ['./src/js/**/*.js']
+	, scssPaths = ['./src/scss/**/*.scss'];
 
-gulp.task('react', function() {
-    gulp.src('./src/*.jsx')
-        .pipe(react())
-        .pipe(gulp.dest('build'));
+
+gulp.task('bowerCss', function() {
+	gulp.src('./bower_components/select2/select2.css')
+	.pipe(gulp.dest('./public/css'));
 });
 
-gulp.task('default', function() {
-	http.createServer(ecstatic({
-		root: __dirname
-	})).listen(8080);
+gulp.task('sass', ['bowerCss'], function () {
+	gulp.src('./src/scss/app.scss')
+		.pipe(sass({
+			outputStyle: 'compressed'
+		}))
+		.pipe(gulp.dest('./public/css'))
+		.pipe(livereload(livereloadServer))
+		.pipe(notify({
+			message: '<%= file.relative %> built'
+		}));
+});
 
-	gutil.log(gutil.colors.blue('HTTP server listening on port 8080'));
+gulp.task('browserify', function() {
+	return gulp.src('./src/js/index.js', { read: false })
+		.pipe(browserify({
+			debug: !gutil.env.production
+			, transform: ['reactify', 'debowerify']
+		}))
+		.pipe(rename('app.js'))
+		.pipe(gulp.dest('public/js'))
+		.pipe(livereload(livereloadServer))
+		.pipe(notify({
+			message: '<%= file.relative %> built'
+		}));
+});
 
+gulp.task('uglify', ['browserify'], function() {
+	return gulp.src('./public/js/app.js')
+		.pipe(rename({suffix: '.min'}))
+		.pipe(uglify())
+		.pipe(gulp.dest('./public/js'))
+		.pipe(notify({
+			message: '<%= file.relative %> built'
+		}));
+});
 
+gulp.task('server', function() {
+	var port = 8080
+		, app = express();
 
-	var livereloadServer = livereload();
+	app.use(express.static(path.join(__dirname, 'public')));
 
-	gulp.watch('index.html').on('change', function(file) {
-		livereloadServer.changed(file.path);
+	/*
+	if(!gutil.env.production) {
+		var srcPath = path.join(__dirname, 'src');
+
+		app.use(srcPath, express.static(srcPath));
+		gutil.log(gutil.colors.yellow('Mounted "' + srcPath + '" file for debugging!'));
+	}
+	*/
+
+	app.listen(port);
+});
+
+gulp.task('watch', function() {
+	livereloadServer.listen(35729, function(err) {
+		if(err) {
+			gutil.log(gutil.colors.red('LiveReload Error: ' + err));
+		}
+
+		gulp.watch(srcPaths, ['uglify']);
+		gulp.watch(scssPaths, ['sass']);
 	});
-
-	//gulp.watch('index.html', [])._watcher.on('all', livereload);
-	//gulp.watch('src/*.jsx', ['react'])._watcher.on('all', livereload);
-
-	//gulp.watch('src/scss/**', ['styles'])._watcher.on('all', livereload);
 });
+
+gulp.task('default', ['sass', 'uglify', 'server', 'watch']);
