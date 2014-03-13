@@ -21,7 +21,10 @@ var gulp = require('gulp')
 
 gulp.task('bowerCss', function() {
 	gulp.src('./bower_components/select2/select2.css')
-	.pipe(gulp.dest('./public/css'));
+	.pipe(gulp.dest('./public/css/select2'));
+
+	gulp.src('./bower_components/select2/select2*.png')
+	.pipe(gulp.dest('./public/css/select2'));
 });
 
 gulp.task('sass', ['bowerCss'], function () {
