@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 var React = require('react')
-	, Button = require('../controls/button')
 	, SetIntervalMixin = require('../../mixins/setInterval')
+	, ActionDrawer = require('./actionDrawer')
 	, api = require('../../api')
 	, moment = require('moment');
 
@@ -76,12 +76,12 @@ var Connection = React.createClass({
 	, render: function() {
 		return (
 			/* jshint ignore:start */
-			<div>
+			<div onClick={ this.handleToggleActionDrawer }>
 				{ this.props.connection.origin.name } to { this.props.connection.destination.name }
 				{ this.props.connection.via && this.props.connection.via.length > 0 ? ' (via ' + this.props.connection.via.length + ' station(s))' : '' }
 				{ this.state.refreshing ? <i className='fa fa-spinner fa-spin' /> : '' }
 				{ !this.state.refreshing && this.state.fromNow ? <span className='fromnow'>{ this.state.fromNow }</span> : '' }
-				{ this.state.showActions ? <Actions /> : '' }
+				{ this.state.showActions ? <ActionDrawer connection={ this.props.connection } onDeleteConnection={ this.props.onDelete } /> : '' }
 			</div>
 			/* jshint ignore:end */
 		);
