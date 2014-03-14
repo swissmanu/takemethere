@@ -1,6 +1,8 @@
 /** @jsx React.DOM */
 var React = require('react')
-	, ReactSelect2 = require('./reactSelect2');
+	, ReactSelect2 = require('./reactSelect2')
+	, api = require('../api');
+
 
 /** ReactComponent: StationDropDown
  * Wraps the <Select2> component and allows searches on transportation stations.
@@ -12,17 +14,13 @@ var StationDropDown = React.createClass({
 	}
 
 	, queryStations: function(query) {
-		$.get(
-			'http://transport.opendata.ch/v1/locations'
-			, {
-				query: query.term
-			}
-			, function success(response) {
-				var stations = response.stations;
+		api.locations(query.term, function(err, stations) {
+			if(err === null) {
 				query.callback({
 					results: stations
 				});
-			});
+			}
+		});
 	}
 	, formatStation: function(station) {
 		return station.name;

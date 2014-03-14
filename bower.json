@@ -8,8 +8,8 @@
   "homepage": "http://github.com/swissmanu/takemethere",
   "private": true,
   "dependencies": {
-    "moment": "~2.5.0",
     "select2": "~3.4.5",
-    "jquery": "~2.1.0"
+    "jquery": "~2.1.0",
+    "fontawesome": "~4.0.3"
   }
 }

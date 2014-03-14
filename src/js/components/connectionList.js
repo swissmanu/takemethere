@@ -45,7 +45,7 @@ var generateGUID = (typeof(window) !== 'undefined' &&
 function buildDefaultConnections() {
 	return [{
 		id: generateGUID(),
-		from: {
+		origin: {
 			id: '008576090'
 			, name: 'Rapperswil SG Bahnhof'
 			, coordinate: {
@@ -54,7 +54,7 @@ function buildDefaultConnections() {
 				, y: 47.224974
 			}
 		}
-		, to: {
+		, destination: {
 			id: '008574671'
 			, name: 'Domat/Ems Plaregna'
 			, coordinate: {
@@ -74,7 +74,7 @@ function buildDefaultConnections() {
 		}]
 	}, {
 		id: generateGUID(),
-		from: {
+		origin: {
 			id: "008580199"
 			, "name":"Chur, Postplatz"
 			, "coordinate": {
@@ -83,7 +83,7 @@ function buildDefaultConnections() {
 				, "y":46.851301
 			}
 		}
-		, to: {
+		, destination: {
 			id: '008574671'
 			, name: 'Domat/Ems Plaregna'
 			, coordinate: {
@@ -99,7 +99,7 @@ function buildDefaultConnections() {
 var ConnectionList = React.createClass({
 	getInitialState: function() {
 		return {
-			showAddConnectionForm: true
+			showAddConnectionForm: false
 		};
 	}
 	, componentWillMount: function() {
@@ -132,8 +132,8 @@ var ConnectionList = React.createClass({
 		var connections = this.state.connections;
 		connections.push({
 			id: generateGUID()
-			, from: origin
-			, to: destination
+			, origin: origin
+			, destination: destination
 			, via: via
 		});
 

@@ -19,7 +19,7 @@ var gulp = require('gulp')
 	, scssPaths = ['./src/scss/**/*.scss'];
 
 
-gulp.task('bowerCss', function() {
+gulp.task('bowerSelect2', function() {
 	gulp.src('./bower_components/select2/select2.css')
 	.pipe(gulp.dest('./public/css/select2'));
 
@@ -27,7 +27,15 @@ gulp.task('bowerCss', function() {
 	.pipe(gulp.dest('./public/css/select2'));
 });
 
-gulp.task('sass', ['bowerCss'], function () {
+gulp.task('bowerFontawesome', function() {
+	gulp.src('./bower_components/fontawesome/fonts/*')
+	.pipe(gulp.dest('./public/fonts'));
+});
+
+gulp.task('bower', ['bowerSelect2', 'bowerFontawesome']);
+
+
+gulp.task('sass', ['bower'], function () {
 	gulp.src('./src/scss/app.scss')
 		.pipe(sass({
 			outputStyle: 'compressed'
@@ -45,6 +53,9 @@ gulp.task('browserify', function() {
 			debug: !gutil.env.production
 			, transform: ['reactify', 'debowerify']
 		}))
+		.on('prebundle', function(bundle) {
+			bundle.require('../../node_modules/moment/lang/de.js', {expose: 'moment-de'});
+		})
 		.pipe(rename('app.js'))
 		.pipe(gulp.dest('public/js'))
 		.pipe(livereload(livereloadServer))
