@@ -2,9 +2,9 @@
 /* jshint ignore:start */
 
 var React = require('react')
-	, ConnectionList = require('./components/connectionList');
+	, Container = require('./components/container');
 
 React.renderComponent(
-	<ConnectionList />
+	<Container />
 	, document.getElementById('content')
 );

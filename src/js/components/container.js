@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 var React = require('react')
-	, Button = require('./button')
-	, ConnectionForm = require('./connectionForm')
-	, Connection = require('./connection');
+	, Button = require('./controls/button')
+	, ConnectionList = require('./connectionList')
+	, ConnectionForm = require('./connectionForm');
 
 
 var generateGUID = (typeof(window) !== 'undefined' &&
@@ -96,12 +96,14 @@ function buildDefaultConnections() {
 }
 
 
-var ConnectionList = React.createClass({
+var Container = React.createClass({
 	getInitialState: function() {
 		return {
-			showAddConnectionForm: false
+			connections: []
+			, showAddConnectionForm: false
 		};
 	}
+
 	, componentWillMount: function() {
 		var connections;
 		/* global localStorage */
@@ -139,6 +141,7 @@ var ConnectionList = React.createClass({
 
 		this.setState({ connections: connections });
 	}
+
 	, handleDeleteConnection: function(connectionToDelete) {
 		var connections = this.state.connections;
 
@@ -151,7 +154,7 @@ var ConnectionList = React.createClass({
 			}
 		});
 
-		this.setState({connections: connections});
+		this.setState({ connections: connections });
 	}
 
 	, handleLoadDemoData: function() {
@@ -162,17 +165,6 @@ var ConnectionList = React.createClass({
 	}
 
 	, render: function() {
-		var self = this
-			, connectionNodes = this.state.connections.map(function(connection, index) {
-				return (
-					/* jshint ignore:start */
-					<li key={ connection.id + '-' + index }>
-						<Connection connection={ connection } onDelete={ self.handleDeleteConnection } />
-					</li>
-					/* jshint ignore:end */
-				);
-			});
-
 		return (
 			/* jshint ignore:start */
 			<div>
@@ -180,13 +172,11 @@ var ConnectionList = React.createClass({
 				{ !this.state.showAddConnectionForm ? <Button label='Load Demo Data' onClick={ this.handleLoadDemoData } /> : '' }
 				{ !this.state.showAddConnectionForm ? <Button label='Add' onClick={ this.toggleConnectionForm } /> : '' }
 				{ this.state.showAddConnectionForm ? <ConnectionForm onSave={ this.handleSaveNewConnection } onCancel={ this.toggleConnectionForm } /> : '' }
-				<ul>
-					{ connectionNodes }
-				</ul>
+				<ConnectionList connections={ this.state.connections } onDeleteConnection={ this.handleDeleteConnection } />
 			</div>
 			/* jshint ignore:end */
 		);
 	}
 });
 
-module.exports = ConnectionList;
+module.exports = Container;

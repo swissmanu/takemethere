@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 var React = require('react')
 	, ReactSelect2 = require('./reactSelect2')
-	, api = require('../api');
+	, api = require('../../api');
 
 
 /** ReactComponent: StationDropDown

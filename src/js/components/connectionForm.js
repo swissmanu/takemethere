@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 var React = require('react')
-	, Button = require('./button')
-	, StationDropDown = require('./stationDropDown');
+	, Button = require('./controls/button')
+	, StationDropDown = require('./controls/stationDropDown');
 
 var ConnectionForm = React.createClass({
 	getInitialState: function() {
