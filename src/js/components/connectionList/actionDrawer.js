@@ -12,8 +12,8 @@ var ActionDrawer = React.createClass({
 		return (
 			/* jshint ignore:start */
 			<div className='actions'>
-				<Button className='delete' label='Delete' onClick={ this.handleDeleteConnection } />
-				<Button className='reverse' label='Reverse' />
+				<Button className='delete' label='Delete' icon='fa-trash-o' onClick={ this.handleDeleteConnection } />
+				<Button className='reverse' label='Flip' icon='fa-exchange' />
 			</div>
 			/* jshint ignore:end */
 		);

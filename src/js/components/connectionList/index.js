@@ -9,6 +9,12 @@ var ConnectionList = React.createClass({
 		, onDeleteConnection: React.PropTypes.func
 	}
 
+	, getInitialState: function() {
+		return {
+			showActions: false
+		};
+	}
+
 	, handleDeleteConnection: function(connectionToDelete) {
 		this.props.onDeleteConnection(connectionToDelete);
 	}
@@ -18,7 +24,7 @@ var ConnectionList = React.createClass({
 			, connectionNodes = this.props.connections.map(function(connection, index) {
 				return (
 					/* jshint ignore:start */
-					<li key={ connection.id + '-' + index }>
+					<li className='item' key={ connection.id + '-' + index }>
 						<Item connection={ connection } onDelete={ self.handleDeleteConnection } />
 					</li>
 					/* jshint ignore:end */
@@ -27,7 +33,7 @@ var ConnectionList = React.createClass({
 
 		return (
 			/* jshint ignore:start */
-			<ul>
+			<ul className='connection-list'>
 				{ connectionNodes }
 			</ul>
 			/* jshint ignore:end */

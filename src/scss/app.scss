@@ -1,11 +1,99 @@
-@import 'select2/select2.css';
+@import "select2/select2.css";
 
-@import 'bourbon/bourbon';
-@import 'neat/neat';
-@import '../../bower_components/fontawesome/scss/font-awesome.scss';
+@import "bourbon/bourbon";
+@import "neat/neat";
+@import "../../bower_components/fontawesome/scss/font-awesome.scss";
+
+@import "_grid-settings";
+@import "_variables";
+
+* {
+	@include box-sizing(border-box);
+}
 
 body {
 	font-family: 'Helvetica Neue', Arial, sans-serif;
+	@include outer-container;
+
+	background-color: $color-neutral;
+}
+
+button {
+	cursor: pointer;
+}
+
+header {
+	margin-top: 10px;
+}
+
+.connection-list {
+
+	$size: 30px;
+	$padding: 4px;
+
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	.item {
+		@include span-columns(10);
+
+		background: $color2;
+		height: $size + 2*$padding;
+		padding: $padding 3*$padding ;
+		&:nth-child(2n) {
+			background: $color3;
+		}
+
+		@include media($mobile) {
+			height: auto;
+		}
+
+		.content {
+			@include span-columns(8 of 10);
+			padding-top: 5px;
+
+			@include media($mobile) {
+				@include span-columns(4);
+			}
+		}
+
+		.actions {
+			@include span-columns(2 of 10);
+			@include omega;
+
+			text-align: right;
+
+			button {
+				margin: 0;
+				border: none;
+				background: darken($color2, 10%);
+				color: darken($color2, 40%);
+
+				height: $size;
+				margin-right: 1px;
+
+				&:last-child {
+					margin-right: 0;
+				}
+
+				i {
+					font-size: 18px;
+					margin-right: 4px;
+				}
+			}
+
+			@include media($mobile) {
+				@include span-columns(4);
+
+				button {
+					@include span-columns(2);
+				}
+			}
+		}
+
+
+	}
 }
 
 

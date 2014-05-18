@@ -18,14 +18,18 @@ var Connection = React.createClass({
 			nextDeparture: undefined
 			, fromNow: undefined
 
-			, refreshing: false
 			, showActions: false
+			, refreshing: false
 		};
 	}
 
 	, componentDidMount: function() {
 		this.loadNextConnection();
 		this.setInterval(this.handleAutomaticUpdate, UPDATE_INTERVAL);
+	}
+
+	, handleToggleActionDrawer: function() {
+		this.setState({ showActions: !this.state.showActions });
 	}
 
 	, handleAutomaticUpdate: function() {
@@ -40,17 +44,13 @@ var Connection = React.createClass({
 
 	}
 
-	, handleToggleActionDrawer: function() {
-		this.setState({ showActions: !this.state.showActions });
-	}
-
 	, loadNextConnection: function() {
 		var self = this;
 
 		self.setState({ refreshing: true });
 		api.connections(
-			this.props.connection.origin
-			, this.props.connection.destination
+			this.props.connection.from
+			, this.props.connection.to
 			, this.props.connection.via
 			, function(err, connections) {
 				var next = connections[0]
@@ -76,12 +76,14 @@ var Connection = React.createClass({
 	, render: function() {
 		return (
 			/* jshint ignore:start */
-			<div onClick={ this.handleToggleActionDrawer }>
-				{ this.props.connection.origin.name } to { this.props.connection.destination.name }
-				{ this.props.connection.via && this.props.connection.via.length > 0 ? ' (via ' + this.props.connection.via.length + ' station(s))' : '' }
-				{ this.state.refreshing ? <i className='fa fa-spinner fa-spin' /> : '' }
-				{ !this.state.refreshing && this.state.fromNow ? <span className='fromnow'>{ this.state.fromNow }</span> : '' }
-				{ this.state.showActions ? <ActionDrawer connection={ this.props.connection } onDeleteConnection={ this.props.onDelete } /> : '' }
+			<div>
+				<div className='content' onClick={ this.handleToggleActionDrawer }>
+					{ this.props.connection.from.name } to { this.props.connection.to.name }
+					{ this.props.connection.via && this.props.connection.via.length > 0 ? ' (via ' + this.props.connection.via.length + ' station(s))' : '' }
+					{ this.state.refreshing ? <i className='fa fa-spinner fa-spin' /> : '' }
+					{ !this.state.refreshing && this.state.fromNow ? <span className='fromnow'>{ this.state.fromNow }</span> : '' }
+				</div>
+				{ this.state.showActions ? <ActionDrawer connection={ this.props.connection } onDeleteConnection={ this.props.onDelte } /> : '' }
 			</div>
 			/* jshint ignore:end */
 		);
