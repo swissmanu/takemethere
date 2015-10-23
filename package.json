@@ -1,8 +1,8 @@
 {
-  "name": "typescript-playground",
+  "name": "takemethere",
   "version": "0.0.1",
   "private": true,
-  "description": "A playground with TypeScript and stuff.",
+  "description": "Add your favorite Swiss public transportation routes and get upcoming departure times for them on one sight.",
   "main": "build/src/index.js",
   "scripts": {
     "postinstall": "node_modules/.bin/tsd install",
