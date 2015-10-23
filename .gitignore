@@ -1,6 +1,6 @@
 .DS_Store
+build/
+dist/
 node_modules/
-bower_components/
-public/css/
-public/fonts/
-public/js/app*.js
+typings/
+npm-debug.log

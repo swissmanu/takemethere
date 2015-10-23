@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"outDir": "./build",
+		"module": "commonjs",
+		"jsx": "react"
+	},
+	"exclude": [
+		"node_modules"
+	]
+}
