@@ -4,14 +4,14 @@
 import './app.scss';
 
 import * as React from 'react';
-import { FontIcon, FlatButton, CircularProgress, Card, AppBar } from 'material-ui';
+import { List, ListItem, FontIcon, FlatButton, CircularProgress, Card, AppBar } from 'material-ui';
 import FavoriteCard from './favoriteCard';
 import { fetchFavoritesIfNeeded, invalidateFavorites } from '../actions/favorites';
 import { connect } from 'react-redux';
-import * as Store from '../store';
+import * as Store from '../store/index';
 
 interface AppProps {
-	favorites?: Store.FavoritesStoreState
+	favorites?: Store.FavoritesStoreState,
 	dispatch?: Function
 }
 
@@ -32,7 +32,7 @@ class App extends React.Component<AppProps, any> {
 	render() {
 		let cards;
 		const favorites = this.props.favorites;
-
+		
 		if(!favorites.isFetching) {
 			if(favorites.items.length === 0) {
 				cards = this.createNoConnectionMessage();
@@ -49,6 +49,8 @@ class App extends React.Component<AppProps, any> {
 							/>
 					);
 				});
+
+				cards = <List>{ cards }</List>;
 			}
 		} else {
 			cards = this.createLoadingIndicator();

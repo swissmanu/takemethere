@@ -2,7 +2,7 @@
 /// <reference path="../../typings/material-ui/material-ui.d.ts" />
 
 import * as React from 'react';
-import { Card, CardHeader, CardText, Avatar, FontIcon } from 'material-ui';
+    import { ListItem, MenuItem, IconMenu, IconButton, Avatar, FontIcon } from 'material-ui';
 import { Favorite } from '../reducers/favorites';
 
 interface FavoriteCardProps extends React.Props<FavoriteCard> {
@@ -18,15 +18,20 @@ export default class FavoriteCard extends React.Component<FavoriteCardProps, any
         let icon = <FontIcon className="material-icons">{ this.props.favorite.icon }</FontIcon>;
         let avatar = <Avatar icon={ icon } />;
 
+        let iconButton = <IconButton>more-vert</IconButton>;
+        let iconMenu = (
+            <IconMenu iconButtonElement={iconButton}>
+                <MenuItem index={0}>Flip</MenuItem>
+            </IconMenu>
+        );
+
         return (
-            <Card style={ CARD_STYLE } expandable={ true } initiallyExpanded={ false }>
-                <CardHeader
-                    avatar={ avatar }
-                    title={ title }
-                    subtitle={ 'Next: ' + nextDeparture }
-                    showExpandableButton={ true }
-                    />
-            </Card>
+            <ListItem
+                primaryText={ title }
+                secondaryText={ 'Next: ' + nextDeparture }
+                leftAvatar={ avatar }
+                rightIconButton={ iconButton }
+                />
         );
     }
 }

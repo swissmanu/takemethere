@@ -2,7 +2,7 @@
 
 import * as TransportAPI from '../transportApi';
 import * as Q from 'q';
-import * as Store from '../store';
+import * as Store from '../store/index';
 
 export const INVALIDATE_FAVORITES = 'INVALIDATE_FAVORITES';
 export const FETCH_FAVORITES_REQUEST = 'FETCH_FAVORITES_REQUEST';

@@ -1,5 +1,5 @@
 import * as TransportAPI from '../transportApi';
-import * as Store from '../store';
+import * as Store from '../store/index';
 import {
 	INVALIDATE_FAVORITES,
 	FETCH_FAVORITES_REQUEST,
@@ -11,9 +11,9 @@ const plainExtend = require('amp-extend');
 const extend = <T>(...targets: T[]) => plainExtend.apply(this, [{}].concat(targets));
 
 export interface Favorite {
-    icon: string,
-    from: TransportAPI.Station,
-    to: TransportAPI.Station,
+    icon?: string,
+    from?: TransportAPI.Station,
+    to?: TransportAPI.Station,
     nextConnections?: TransportAPI.Connection[]
 };
 
@@ -36,8 +36,15 @@ export default function favorites(prevState: Store.FavoritesStoreState = {
 			return extend<Store.FavoritesStoreState>({}, prevState, {
 				isFetching: false,
 				didInvalidate: false,
-				items: action.favorites,
-				lastUpdated: action.recivedAt
+				lastUpdated: action.recivedAt,
+				items: action.favorites.map((favorite) => {
+					return extend<Store.FavoriteStoreState>(favorite, {
+						isFetching: false,
+						didInvalidate: false,
+						lastUpdated: action.recivedAt
+					});
+				}),
+
 			});
 		case FETCH_FAVORITES_FAILED:
 			return extend<Store.FavoritesStoreState>({}, prevState, {
