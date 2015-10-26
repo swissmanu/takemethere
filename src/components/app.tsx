@@ -6,7 +6,12 @@ import './app.scss';
 import * as React from 'react';
 import { List, ListItem, FontIcon, FlatButton, CircularProgress, Card, AppBar } from 'material-ui';
 import FavoriteCard from './favoriteCard';
-import { fetchFavoritesIfNeeded, invalidateFavorites } from '../actions/favorites';
+import {
+	fetchFavoritesIfNeeded,
+	invalidateFavorites,
+	flipFavoriteDirection,
+	fetchFavoriteIfNeeded
+} from '../actions/favorites';
 import { connect } from 'react-redux';
 import * as Store from '../store/index';
 
@@ -32,7 +37,8 @@ class App extends React.Component<AppProps, any> {
 	render() {
 		let cards;
 		const favorites = this.props.favorites;
-		
+		const self = this;
+
 		if(!favorites.isFetching) {
 			if(favorites.items.length === 0) {
 				cards = this.createNoConnectionMessage();
@@ -46,6 +52,7 @@ class App extends React.Component<AppProps, any> {
 						<FavoriteCard
 							favorite={ favorite }
 							key={ key }
+							onClick={ self.onClickFavorite.bind(self, index) }
 							/>
 					);
 				});
@@ -97,6 +104,11 @@ class App extends React.Component<AppProps, any> {
 	private onClickRefresh() {
 		this.props.dispatch(invalidateFavorites());
 		this.props.dispatch(fetchFavoritesIfNeeded());
+	}
+
+	private onClickFavorite(index: number) {
+		this.props.dispatch(flipFavoriteDirection(index));
+		this.props.dispatch(fetchFavoriteIfNeeded(index));
 	}
 }
 

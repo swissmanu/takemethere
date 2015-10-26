@@ -4,7 +4,11 @@ import {
 	INVALIDATE_FAVORITES,
 	FETCH_FAVORITES_REQUEST,
 	FETCH_FAVORITES_SUCCESS,
-	FETCH_FAVORITES_FAILED
+	FETCH_FAVORITES_FAILED,
+	FLIP_FAVORITE_DIRECTION,
+	FETCH_FAVORITE_REQUEST,
+	FETCH_FAVORITE_SUCCESS,
+	FETCH_FAVORITE_FAILED
 } from '../actions/favorites';
 
 const plainExtend = require('amp-extend');
@@ -47,8 +51,59 @@ export default function favorites(prevState: Store.FavoritesStoreState = {
 
 			});
 		case FETCH_FAVORITES_FAILED:
-			return extend<Store.FavoritesStoreState>({}, prevState, {
+			return extend<Store.FavoritesStoreState>(prevState, {
 				isFetching: false
+			});
+
+
+		case FETCH_FAVORITE_REQUEST:
+			return extend<Store.FavoritesStoreState>(prevState, {
+				items: [
+					...prevState.items.slice(0, action.index),
+					extend<Store.FavoriteStoreState>(prevState.items[action.index], {
+						isFetching: true,
+						didInvalidate: false
+					}),
+					...prevState.items.slice(action.index + 1)
+				]
+			});
+		case FETCH_FAVORITE_SUCCESS:
+			return extend<Store.FavoritesStoreState>(prevState, {
+				items: [
+					...prevState.items.slice(0, action.index),
+					extend<Store.FavoriteStoreState>(
+						action.favorite,
+						{
+							isFetching: false,
+							didInvalidate: false,
+							lastUpdated: action.recivedAt
+						}
+					),
+					...prevState.items.slice(action.index + 1)
+				]
+			});
+		case FETCH_FAVORITE_FAILED:
+			return extend<Store.FavoritesStoreState>(prevState, {
+				items: [
+					...prevState.items.slice(0, action.index),
+					extend<Store.FavoriteStoreState>(prevState.items[action.index], {
+						isFetching: false
+					}),
+					...prevState.items.slice(action.index + 1)
+				]
+			});
+
+		case FLIP_FAVORITE_DIRECTION:
+			return extend<Store.FavoritesStoreState>(prevState, {
+				items: [
+					...prevState.items.slice(0, action.index),
+					extend<Store.FavoriteStoreState>(prevState.items[action.index], {
+						from: prevState.items[action.index].to,
+						to: prevState.items[action.index].from,
+						didInvalidate: true
+					}),
+					...prevState.items.slice(action.index + 1)
+				]
 			});
 		default:
 			return prevState;
