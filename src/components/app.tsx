@@ -5,7 +5,7 @@ import './app.scss';
 
 import * as React from 'react';
 import { List, ListItem, FontIcon, FlatButton, CircularProgress, Card, AppBar } from 'material-ui';
-import FavoriteCard from './favoriteCard';
+import FavoriteListItem from './favoriteListItem';
 import {
 	fetchFavoritesIfNeeded,
 	invalidateFavorites,
@@ -35,21 +35,21 @@ class App extends React.Component<AppProps, any> {
 	}
 
 	render() {
-		let cards;
+		let listItems;
 		const favorites = this.props.favorites;
 		const self = this;
 
 		if(!favorites.isFetching) {
 			if(favorites.items.length === 0) {
-				cards = this.createNoConnectionMessage();
+				listItems = this.createNoConnectionMessage();
 			} else {
-				cards = favorites.items.map((favorite, index) => {
+				listItems = favorites.items.map((favorite, index) => {
 					const key = index + '-' +
 						favorite.from.id + '-' +
 						favorite.to.id;
 
 					return (
-						<FavoriteCard
+						<FavoriteListItem
 							favorite={ favorite }
 							key={ key }
 							onClick={ self.onClickFavorite.bind(self, index) }
@@ -57,17 +57,17 @@ class App extends React.Component<AppProps, any> {
 					);
 				});
 
-				cards = <List>{ cards }</List>;
+				listItems = <List>{ listItems }</List>;
 			}
 		} else {
-			cards = this.createLoadingIndicator();
+			listItems = this.createLoadingIndicator();
 		}
 
 		return (
 			<div className="app">
 				<Card>
 					{ this.createAppBar('TakeMeThere') }
-					{ cards }
+					{ listItems }
 				</Card>
 			</div>
 		);
