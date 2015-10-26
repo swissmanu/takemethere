@@ -20762,7 +20762,7 @@
 	__webpack_require__(176);
 	var React = __webpack_require__(1);
 	var material_ui_1 = __webpack_require__(178);
-	var favoriteCard_1 = __webpack_require__(338);
+	var favoriteListItem_1 = __webpack_require__(338);
 	var favorites_1 = __webpack_require__(339);
 	var react_redux_1 = __webpack_require__(157);
 	function select(state) {
@@ -20777,25 +20777,27 @@
 	        this.props.dispatch(favorites_1.fetchFavoritesIfNeeded());
 	    };
 	    App.prototype.render = function () {
-	        var cards;
+	        var listItems;
 	        var favorites = this.props.favorites;
+	        var self = this;
 	        if (!favorites.isFetching) {
 	            if (favorites.items.length === 0) {
-	                cards = this.createNoConnectionMessage();
+	                listItems = this.createNoConnectionMessage();
 	            }
 	            else {
-	                cards = favorites.items.map(function (favorite, index) {
+	                listItems = favorites.items.map(function (favorite, index) {
 	                    var key = index + '-' +
 	                        favorite.from.id + '-' +
 	                        favorite.to.id;
-	                    return (React.createElement(favoriteCard_1["default"], {"favorite": favorite, "key": key}));
+	                    return (React.createElement(favoriteListItem_1["default"], {"favorite": favorite, "key": key, "onClick": self.onClickFavorite.bind(self, index)}));
 	                });
+	                listItems = React.createElement(material_ui_1.List, null, listItems);
 	            }
 	        }
 	        else {
-	            cards = this.createLoadingIndicator();
+	            listItems = this.createLoadingIndicator();
 	        }
-	        return (React.createElement("div", {"className": "app"}, React.createElement(material_ui_1.Card, null, this.createAppBar('TakeMeThere'), cards)));
+	        return (React.createElement("div", {"className": "app"}, React.createElement(material_ui_1.Card, null, this.createAppBar('TakeMeThere'), listItems)));
 	    };
 	    App.prototype.createAppBar = function (title) {
 	        var style = { 'marginBottom': '16px' };
@@ -20813,6 +20815,10 @@
 	    App.prototype.onClickRefresh = function () {
 	        this.props.dispatch(favorites_1.invalidateFavorites());
 	        this.props.dispatch(favorites_1.fetchFavoritesIfNeeded());
+	    };
+	    App.prototype.onClickFavorite = function (index) {
+	        this.props.dispatch(favorites_1.flipFavoriteDirection(index));
+	        this.props.dispatch(favorites_1.fetchFavoriteIfNeeded(index));
 	    };
 	    return App;
 	})(React.Component);
@@ -43160,7 +43166,14 @@
 	        var nextDeparture = this.props.favorite.nextConnections[0].from.departure.toString();
 	        var icon = React.createElement(material_ui_1.FontIcon, {"className": "material-icons"}, this.props.favorite.icon);
 	        var avatar = React.createElement(material_ui_1.Avatar, {"icon": icon});
-	        return (React.createElement(material_ui_1.Card, {"style": CARD_STYLE, "expandable": true, "initiallyExpanded": false}, React.createElement(material_ui_1.CardHeader, {"avatar": avatar, "title": title, "subtitle": 'Next: ' + nextDeparture, "showExpandableButton": true})));
+	        var iconButton;
+	        if (this.props.favorite.isFetching) {
+	            iconButton = React.createElement(material_ui_1.CircularProgress, {"size": 0.5, "mode": "indeterminate"});
+	        }
+	        else {
+	            iconButton = (React.createElement(material_ui_1.IconButton, {"onClick": this.props.onClick}, React.createElement(material_ui_1.FontIcon, {"className": "material-icons"}, "swap_horiz")));
+	        }
+	        return (React.createElement(material_ui_1.ListItem, {"primaryText": title, "secondaryText": 'Next: ' + nextDeparture, "leftAvatar": avatar, "rightIconButton": iconButton}));
 	    };
 	    return FavoriteCard;
 	})(React.Component);
@@ -43179,6 +43192,10 @@
 	exports.FETCH_FAVORITES_REQUEST = 'FETCH_FAVORITES_REQUEST';
 	exports.FETCH_FAVORITES_SUCCESS = 'FETCH_FAVORITES_SUCCESS';
 	exports.FETCH_FAVORITES_FAILED = 'FETCH_FAVORITES_FAILED';
+	exports.FLIP_FAVORITE_DIRECTION = 'FLIP_FAVORITE_DIRECTION';
+	exports.FETCH_FAVORITE_REQUEST = 'FETCH_FAVORITE_REQUEST';
+	exports.FETCH_FAVORITE_SUCCESS = 'FETCH_FAVORITE_SUCCESS';
+	exports.FETCH_FAVORITE_FAILED = 'FETCH_FAVORITE_FAILED';
 	function invalidateFavorites() {
 	    return {
 	        type: exports.INVALIDATE_FAVORITES
@@ -43193,6 +43210,22 @@
 	    };
 	}
 	exports.fetchFavoritesIfNeeded = fetchFavoritesIfNeeded;
+	function flipFavoriteDirection(index) {
+	    return {
+	        type: exports.FLIP_FAVORITE_DIRECTION,
+	        index: index
+	    };
+	}
+	exports.flipFavoriteDirection = flipFavoriteDirection;
+	function fetchFavoriteIfNeeded(index) {
+	    return function (dispatch, getState) {
+	        var favorite = getState().favorites.items[index];
+	        if (shouldFetchFavorite(favorite)) {
+	            return dispatch(fetchFavorite(index, favorite));
+	        }
+	    };
+	}
+	exports.fetchFavoriteIfNeeded = fetchFavoriteIfNeeded;
 	function requestFavorites() {
 	    return {
 	        type: exports.FETCH_FAVORITES_REQUEST
@@ -43226,22 +43259,39 @@
 	                to: { id: '008509000' }
 	            }];
 	        return Q.all(rawFavorites.map(function (rawFavorite) {
-	            return Q.all([
-	                TransportAPI.locations(rawFavorite.from.id),
-	                TransportAPI.locations(rawFavorite.to.id),
-	                TransportAPI.connections(rawFavorite.from, rawFavorite.to)
-	            ])
-	                .then(function (resolved) {
-	                return {
-	                    icon: rawFavorite.icon,
-	                    from: resolved[0][0],
-	                    to: resolved[1][0],
-	                    nextConnections: resolved[2]
-	                };
-	            });
+	            return resolveFavorite(rawFavorite);
 	        }))
 	            .then(function (favorites) { return dispatch(receiveFavorites(favorites)); })
 	            .catch(function (error) { return dispatch(failedFavorites(error)); });
+	    };
+	}
+	function requestFavorite(index) {
+	    return {
+	        type: exports.FETCH_FAVORITE_REQUEST,
+	        index: index
+	    };
+	}
+	function receiveFavorite(index, favorite) {
+	    return {
+	        type: exports.FETCH_FAVORITE_SUCCESS,
+	        index: index,
+	        favorite: favorite,
+	        recivedAt: Date.now()
+	    };
+	}
+	;
+	function failedFavorite(index, error) {
+	    return {
+	        type: exports.FETCH_FAVORITE_FAILED,
+	        index: index
+	    };
+	}
+	function fetchFavorite(index, favorite) {
+	    return function (dispatch) {
+	        dispatch(requestFavorite(index));
+	        resolveFavorite(favorite)
+	            .then(function (favorite) { return dispatch(receiveFavorite(index, favorite)); })
+	            .catch(function (error) { return dispatch(failedFavorite(index, error)); });
 	    };
 	}
 	function shouldFetchFavorites(state) {
@@ -43253,6 +43303,27 @@
 	        return false;
 	    }
 	    return favorites.didInvalidate;
+	}
+	function shouldFetchFavorite(favorite) {
+	    if (favorite.isFetching) {
+	        return false;
+	    }
+	    return favorite.didInvalidate;
+	}
+	function resolveFavorite(favorite) {
+	    return Q.all([
+	        TransportAPI.locations(favorite.from.id),
+	        TransportAPI.locations(favorite.to.id),
+	        TransportAPI.connections(favorite.from, favorite.to)
+	    ])
+	        .then(function (resolved) {
+	        return {
+	            icon: favorite.icon,
+	            from: resolved[0][0],
+	            to: resolved[1][0],
+	            nextConnections: resolved[2]
+	        };
+	    });
 	}
 
 
@@ -46835,13 +46906,17 @@
 	/// <reference path="../../typings/redux-thunk/redux-thunk.d.ts" />
 	var redux_1 = __webpack_require__(164);
 	var ThunkMiddleware = __webpack_require__(347);
-	var reducers_1 = __webpack_require__(348);
+	var index_1 = __webpack_require__(348);
 	var createStoreWithMiddlewares = redux_1.applyMiddleware(ThunkMiddleware)(redux_1.createStore);
 	function configureStore() {
-	    var store = createStoreWithMiddlewares(reducers_1["default"], {});
+	    var store = createStoreWithMiddlewares(index_1["default"], {});
 	    return store;
 	}
 	exports.configureStore = configureStore;
+	;
+	;
+	;
+	;
 	;
 
 
@@ -46915,12 +46990,55 @@
 	            return extend({}, prevState, {
 	                isFetching: false,
 	                didInvalidate: false,
-	                items: action.favorites,
-	                lastUpdated: action.recivedAt
+	                lastUpdated: action.recivedAt,
+	                items: action.favorites.map(function (favorite) {
+	                    return extend(favorite, {
+	                        isFetching: false,
+	                        didInvalidate: false,
+	                        lastUpdated: action.recivedAt
+	                    });
+	                })
 	            });
 	        case favorites_1.FETCH_FAVORITES_FAILED:
-	            return extend({}, prevState, {
+	            return extend(prevState, {
 	                isFetching: false
+	            });
+	        case favorites_1.FETCH_FAVORITE_REQUEST:
+	            return extend(prevState, {
+	                items: prevState.items.slice(0, action.index).concat([
+	                    extend(prevState.items[action.index], {
+	                        isFetching: true,
+	                        didInvalidate: false
+	                    })
+	                ], prevState.items.slice(action.index + 1))
+	            });
+	        case favorites_1.FETCH_FAVORITE_SUCCESS:
+	            return extend(prevState, {
+	                items: prevState.items.slice(0, action.index).concat([
+	                    extend(action.favorite, {
+	                        isFetching: false,
+	                        didInvalidate: false,
+	                        lastUpdated: action.recivedAt
+	                    })
+	                ], prevState.items.slice(action.index + 1))
+	            });
+	        case favorites_1.FETCH_FAVORITE_FAILED:
+	            return extend(prevState, {
+	                items: prevState.items.slice(0, action.index).concat([
+	                    extend(prevState.items[action.index], {
+	                        isFetching: false
+	                    })
+	                ], prevState.items.slice(action.index + 1))
+	            });
+	        case favorites_1.FLIP_FAVORITE_DIRECTION:
+	            return extend(prevState, {
+	                items: prevState.items.slice(0, action.index).concat([
+	                    extend(prevState.items[action.index], {
+	                        from: prevState.items[action.index].to,
+	                        to: prevState.items[action.index].from,
+	                        didInvalidate: true
+	                    })
+	                ], prevState.items.slice(action.index + 1))
 	            });
 	        default:
 	            return prevState;
